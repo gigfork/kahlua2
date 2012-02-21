@@ -12,6 +12,7 @@
     <orderEntry type="module" module-name="core" />
     <orderEntry type="library" name="interpreter" level="project" />
     <orderEntry type="module" module-name="core-dep" />
+    <orderEntry type="module" module-name="java7" />
   </component>
 </module>
 

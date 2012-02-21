@@ -26,6 +26,7 @@ public class Kahlua {
 	private final J2SEPlatform platform = new J2SEPlatform();
 	private final KahluaTable env = platform.newEnvironment();
 	private final LuaCaller caller = new LuaCaller(converterManager);
+	private static final boolean USE_JAVA7 = Boolean.getBoolean("kahlua.useJava7");
 
 	public Kahlua() {
 	}
@@ -39,7 +40,9 @@ public class Kahlua {
 	}
 
 	public void execute(Reader reader, String name, String... args) throws IOException {
-		LuaClosure closure = LuaCompiler.loadis(reader, name, env);
+		LuaClosure closure = USE_JAVA7 ?
+				com.headius.kahlua.LuaCompiler.loadis(reader, name, env) :
+				LuaCompiler.loadis(reader, name, env);
 		LuaReturn result = caller.protectedCall(newThread(), closure, args);
 		if (!result.isSuccess()) {
 			System.err.println(result.getErrorString());

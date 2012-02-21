@@ -13,6 +13,7 @@
 	<property name="core.src.dir"       value="${baseDir}/core/src"/>
 	<property name="j2se.src.dir"       value="${baseDir}/j2se/src"/>
 	<property name="interpreter.src.dir"       value="${baseDir}/interpreter/src"/>
+    <property name="java7.src.dir"       value="${baseDir}/java7/src"/>
 
 	<property name="build.dir"     value="${baseDir}/bin"/>
 	<property name="classes.dir"     value="${build.dir}/classes"/>
@@ -34,9 +35,16 @@
         <pathelement path="${classes.dir}/core"/>
     </path>
 
+    <path id="java7.dependencies">
+        <pathelement path="${classes.dir}/core"/>
+        <pathelement location="${baseDir}/lib/asm-all-4.0.jar" />
+    </path>
+
     <path id="interpreter.dependencies">
         <path refid="j2se.dependencies" />
+        <path refid="java7.dependencies" />
         <pathelement path="${classes.dir}/j2se"/>
+        <pathelement path="${classes.dir}/java7"/>
         <pathelement location="${baseDir}/interpreter/lib/jsyntaxpane-0.9.5.jar" />
     </path>
 
@@ -74,6 +82,7 @@
 		<mkdir dir="${build.dir}"/>
 		<mkdir dir="${classes.dir}/core"/>
 		<mkdir dir="${classes.dir}/j2se"/>
+        <mkdir dir="${classes.dir}/java7"/>
 		<mkdir dir="${classes.dir}/interpreter"/>
 		<mkdir dir="${classes.dir}/cldc11"/>
 		<mkdir dir="${build.dir}/core-src-replaced"/>
@@ -83,7 +92,7 @@
 		<mkdir dir="${test.lua.output.dir}"/>
 	</target>
 
-	<target name="compile" depends="setup, compile-core, compile-cldc11, compile-j2se, compile-interpreter" description="Compiles Kahlua">
+	<target name="compile" depends="setup, compile-core, compile-cldc11, compile-j2se, compile-java7, compile-interpreter" description="Compiles Kahlua">
 	</target>
 	
 	<target name="build" depends="compile, build-stdlib" description="Builds Kahlua">
@@ -143,7 +152,19 @@
         </copy>
 	</target>
 
-	<target name="compile-interpreter" depends="compile-j2se">
+    <target name="compile-java7" depends="compile-core">
+        <javac
+                destdir="${classes.dir}/java7"
+                debug="true"
+                target="1.5"
+                source="1.5"
+                classpathref="java7.dependencies"
+                >
+            <src path="${java7.src.dir}"/>
+        </javac>
+    </target>
+
+	<target name="compile-interpreter" depends="compile-j2se, compile-java7">
 		<javac
 			destdir="${classes.dir}/interpreter"
 			debug="true"
@@ -189,6 +210,9 @@
     	<jar jarfile="${build.dir}/kahlua-${version}-j2se.jar">
     		<fileset dir="${classes.dir}/j2se" />
     	</jar>
+        <jar jarfile="${build.dir}/kahlua-${version}-java7.jar">
+            <fileset dir="${classes.dir}/java7" />
+        </jar>
     	<jar jarfile="${build.dir}/kahlua-${version}-interpreter.jar">
     		<fileset dir="${classes.dir}/interpreter" />
     	</jar>
